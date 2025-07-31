@@ -22,6 +22,7 @@ const indexPath = path.join(buildPath, 'index.html');
 
 // Check if frontend build exists
 if (require('fs').existsSync(buildPath)) {
+  console.log('✅ Frontend build found, serving React app');
   app.use(express.static(buildPath));
   
   // Handle React routing, return all requests to React app
