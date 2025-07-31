@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: store-rating-app
+    env: node
+    buildCommand: npm run install-all
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: store-rating-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: store-rating-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: store-rating-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: store-rating-db
+          property: username
+      - key: DB_PASS
+        fromDatabase:
+          name: store-rating-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: store-rating-db
+    databaseName: store_rating_app
+    user: store_rating_user 
