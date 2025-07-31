@@ -17,12 +17,27 @@ app.use('/api/stores', require('./routes/stores'));
 app.use('/api/ratings', require('./routes/ratings'));
 
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, '../frontend/build')));
+const buildPath = path.join(__dirname, '../frontend/build');
+const indexPath = path.join(buildPath, 'index.html');
 
-// Handle React routing, return all requests to React app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-});
+// Check if frontend build exists
+if (require('fs').existsSync(buildPath)) {
+  app.use(express.static(buildPath));
+  
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(indexPath);
+  });
+} else {
+  console.log('⚠️ Frontend build not found. Serving API only.');
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'Store Rating API is running',
+      status: 'Frontend build not available',
+      endpoints: ['/api/auth', '/api/users', '/api/stores', '/api/ratings']
+    });
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
