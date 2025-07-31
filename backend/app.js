@@ -29,6 +29,22 @@ const PORT = process.env.PORT || 5000;
 // Database sync and server start
 async function startServer() {
   try {
+    // Check if database environment variables are available
+    if (!process.env.DB_HOST || !process.env.DB_NAME) {
+      console.log('Database environment variables not set. Starting server without database...');
+      console.log('Available env vars:', Object.keys(process.env).filter(key => key.startsWith('DB_')));
+      
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT} (WITHOUT DATABASE)`);
+        console.log('Please create the PostgreSQL database service on Render and redeploy.');
+      });
+      return;
+    }
+    
+    console.log('Attempting database connection...');
+    console.log('DB_HOST:', process.env.DB_HOST);
+    console.log('DB_NAME:', process.env.DB_NAME);
+    
     await sequelize.sync({ alter: true });
     console.log('Database synced successfully');
     
@@ -37,7 +53,12 @@ async function startServer() {
     });
   } catch (error) {
     console.error('Database sync error:', error);
-    process.exit(1);
+    console.log('Starting server without database connection...');
+    
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT} (DATABASE CONNECTION FAILED)`);
+      console.log('Please check database configuration and redeploy.');
+    });
   }
 }
 
