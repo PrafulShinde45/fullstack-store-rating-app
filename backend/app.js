@@ -62,7 +62,7 @@ async function startServer() {
       console.log('Available DB env vars:', Object.keys(process.env).filter(key => key.startsWith('DB_')));
       console.log('💡 Make sure you have created a PostgreSQL database service named "store-rating-db" on Render');
       
-      app.listen(PORT, () => {
+      app.listen(PORT, '0.0.0.0', () => {
         console.log(`✅ Server is running on port ${PORT} (WITHOUT DATABASE)`);
         console.log('🌐 Your React app will be available, but API calls will fail');
         console.log('📋 Next steps:');
@@ -80,7 +80,7 @@ async function startServer() {
     await sequelize.sync({ alter: true });
     console.log('✅ Database synced successfully');
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server is running on port ${PORT}`);
       console.log('🎉 Full application is ready!');
     });
@@ -88,7 +88,7 @@ async function startServer() {
     console.error('❌ Database sync error:', error);
     console.log('⚠️ Starting server without database connection...');
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`✅ Server is running on port ${PORT} (DATABASE CONNECTION FAILED)`);
       console.log('🔧 Database troubleshooting:');
       console.log('   - Check if PostgreSQL service exists on Render');

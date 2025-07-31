@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Full-stack store rating application",
   "main": "backend/app.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "build": "cd frontend && npx react-scripts build",
