@@ -34,5 +34,5 @@ services:
 
 databases:
   - name: store-rating-db
-    databaseName: store_rating_app
+    databaseName: store_rating_app_dqgw
     user: store_rating_user 
