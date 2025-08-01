@@ -1,16 +1,17 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "seed": "node seed-database.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["node", "express", "api"],
   "author": "",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
+  "description": "Backend API for store rating app",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",

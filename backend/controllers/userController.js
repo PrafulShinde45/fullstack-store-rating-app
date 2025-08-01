@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const getAllUsers = async (req, res) => {
   try {
-    const { name, email, address, role, sortBy = 'name', sortOrder = 'ASC' } = req.query;
+    const { name, email, address, role, sortBy = 'name', sortOrder = 'ASC', page = 1, limit = 10 } = req.query;
     
     let whereClause = {};
     if (name) whereClause.name = { [require('sequelize').Op.iLike]: `%${name}%` };
@@ -11,13 +11,20 @@ const getAllUsers = async (req, res) => {
     if (address) whereClause.address = { [require('sequelize').Op.iLike]: `%${address}%` };
     if (role) whereClause.role = role;
 
-    const users = await User.findAll({
+    const users = await User.findAndCountAll({
       where: whereClause,
       attributes: { exclude: ['password'] },
       order: [[sortBy, sortOrder.toUpperCase()]],
+      limit: parseInt(limit),
+      offset: (page - 1) * limit,
     });
 
-    res.json(users);
+    res.json({
+      users: users.rows,
+      total: users.count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(users.count / limit),
+    });
   } catch (error) {
     console.error('Get all users error:', error);
     res.status(500).json({ message: 'Internal server error' });

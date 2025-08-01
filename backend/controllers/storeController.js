@@ -3,13 +3,14 @@ const { Op } = require('sequelize');
 
 const getAllStores = async (req, res) => {
   try {
-    const { name, address, sortBy = 'name', sortOrder = 'ASC' } = req.query;
+    const { name, address, ownerId, sortBy = 'name', sortOrder = 'ASC', page = 1, limit = 10 } = req.query;
     
     let whereClause = {};
     if (name) whereClause.name = { [Op.iLike]: `%${name}%` };
     if (address) whereClause.address = { [Op.iLike]: `%${address}%` };
+    if (ownerId) whereClause.ownerId = ownerId;
 
-    const stores = await Store.findAll({
+    const stores = await Store.findAndCountAll({
       where: whereClause,
       include: [
         {
@@ -24,10 +25,12 @@ const getAllStores = async (req, res) => {
         },
       ],
       order: [[sortBy, sortOrder.toUpperCase()]],
+      limit: parseInt(limit),
+      offset: (page - 1) * limit,
     });
 
     // Calculate average rating for each store
-    const storesWithRating = stores.map(store => {
+    const storesWithRating = stores.rows.map(store => {
       const storeData = store.toJSON();
       const ratings = storeData.ratings || [];
       const averageRating = ratings.length > 0 
@@ -41,7 +44,12 @@ const getAllStores = async (req, res) => {
       };
     });
 
-    res.json(storesWithRating);
+    res.json({
+      stores: storesWithRating,
+      total: stores.count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(stores.count / limit),
+    });
   } catch (error) {
     console.error('Get all stores error:', error);
     res.status(500).json({ message: 'Internal server error' });
