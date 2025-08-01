@@ -1,6 +1,9 @@
 # Store Rating Application
 
-A simple web application where users can rate and review stores. Built with React and Node.js.
+A full-stack web application where users can rate and review stores. Built with React, Node.js, and PostgreSQL.
+
+**🔗 Live Demo:** https://fullstack-store-rating-app-vvxn.onrender.com/  
+*Note: Initial load may take up to 40 seconds due to free-tier hosting.*
 
 ## What it does
 
