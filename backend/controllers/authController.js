@@ -53,20 +53,28 @@ const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     // Find user
     const user = await User.findOne({ where: { email } });
     if (!user) {
+      console.log(`Login failed: User not found for email ${email}`);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
+      console.log(`Login failed: Invalid password for email ${email}`);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Check if user has the selected role (if role is specified)
     if (role && user.role !== role) {
+      console.log(`Login failed: Role mismatch. Expected: ${role}, Actual: ${user.role}`);
       return res.status(403).json({ 
         message: `Access denied. This account has role: ${user.role}. Please select the correct role.` 
       });
@@ -78,6 +86,8 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    console.log(`Login successful for user: ${email} (${user.role})`);
 
     res.json({
       message: 'Login successful',
