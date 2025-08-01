@@ -5,6 +5,33 @@ A full-stack web application where users can rate and review stores. Built with 
 **🔗 Live Demo:** https://fullstack-store-rating-app-vvxn.onrender.com/  
 *Note: Initial load may take up to 40 seconds due to free-tier hosting.*
 
+## 🚀 Key Features Implemented
+
+✅ **User Authentication & Authorization**  
+- JWT-based authentication system  
+- Role-based access control (Admin, Store Owner, Normal User)  
+- Secure password hashing with bcrypt  
+
+✅ **Store Management System**  
+- Create, view, and manage stores  
+- Store search and filtering  
+- Store owner dashboard with ratings analytics  
+
+✅ **Rating & Review System**  
+- 1–5 star rating system  
+- User rating history  
+- Average rating calculations  
+
+✅ **Admin Dashboard**  
+- User and store management  
+- Dashboard with analytics and statistics  
+- Real-time data visualization  
+
+✅ **Responsive Design**  
+- Mobile-friendly UI  
+- Built with Material-UI components  
+- Modern and intuitive user experience  
+
 ## What it does
 
 - Users can register and login
