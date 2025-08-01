@@ -31,9 +31,21 @@ const Stores = () => {
   const fetchStores = useCallback(async () => {
     try {
       const response = await api.get('/stores');
-      setStores(response.data);
+      
+      // Handle different response structures
+      let storesData = [];
+      if (response.data && response.data.stores) {
+        storesData = response.data.stores;
+      } else if (Array.isArray(response.data)) {
+        storesData = response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        storesData = response.data.data;
+      }
+      
+      setStores(storesData || []);
     } catch (error) {
       console.error('Error fetching stores:', error);
+      setStores([]);
     } finally {
       setLoading(false);
     }
@@ -43,12 +55,24 @@ const Stores = () => {
     try {
       const response = await api.get('/ratings/user');
       const ratingsMap = {};
-      response.data.forEach(rating => {
+      
+      // Handle different response structures
+      let ratingsData = [];
+      if (Array.isArray(response.data)) {
+        ratingsData = response.data;
+      } else if (response.data && Array.isArray(response.data.ratings)) {
+        ratingsData = response.data.ratings;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        ratingsData = response.data.data;
+      }
+      
+      ratingsData.forEach(rating => {
         ratingsMap[rating.storeId] = rating.rating;
       });
       setUserRatings(ratingsMap);
     } catch (error) {
       console.error('Error fetching user ratings:', error);
+      setUserRatings({});
     }
   }, []);
 
@@ -76,7 +100,7 @@ const Stores = () => {
     navigate(`/stores/${storeId}`);
   };
 
-  const filteredStores = stores.filter(store =>
+  const filteredStores = (stores || []).filter(store =>
     store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.address.toLowerCase().includes(searchTerm.toLowerCase())
   );

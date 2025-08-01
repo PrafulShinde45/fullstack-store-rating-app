@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -26,13 +26,13 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -91,7 +91,7 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setFormData({
       name: '',
       email: '',
@@ -104,10 +104,10 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
     setError('');
     setSuccess('');
     onClose();
-  };
+  }, [onClose]);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>
         Add New Store
       </DialogTitle>
@@ -126,6 +126,10 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
           )}
           
           <Stack spacing={3}>
+            <Typography variant="h6" gutterBottom>
+              Store Information
+            </Typography>
+            
             <TextField
               fullWidth
               label="Store Name"
@@ -135,7 +139,6 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
               required
               variant="outlined"
               placeholder="Enter store name"
-              helperText="Store name must be at least 2 characters long"
             />
             
             <TextField
@@ -163,7 +166,7 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
               placeholder="Enter store address"
             />
             
-            <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
               Store Owner Information
             </Typography>
             
@@ -175,7 +178,7 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
               onChange={handleInputChange}
               required
               variant="outlined"
-              placeholder="Enter owner's full name"
+              placeholder="Enter owner full name (minimum 20 characters)"
             />
             
             <TextField
@@ -187,7 +190,7 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
               onChange={handleInputChange}
               required
               variant="outlined"
-              placeholder="Enter owner's email address"
+              placeholder="Enter owner email address"
             />
             
             <TextField
@@ -199,8 +202,7 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
               onChange={handleInputChange}
               required
               variant="outlined"
-              placeholder="Enter owner's password"
-              helperText="Password must be at least 8 characters long"
+              placeholder="Enter owner password (8+ chars, uppercase + special char)"
             />
             
             <TextField
@@ -212,8 +214,8 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
               required
               variant="outlined"
               multiline
-              rows={2}
-              placeholder="Enter owner's address"
+              rows={3}
+              placeholder="Enter owner address"
             />
           </Stack>
         </DialogContent>
@@ -231,7 +233,7 @@ const AddStoreDialog = ({ open, onClose, onStoreAdded }) => {
             variant="contained" 
             disabled={loading}
           >
-            {loading ? 'Creating...' : 'Create Store & Owner'}
+            {loading ? 'Creating...' : 'Create Store'}
           </Button>
         </DialogActions>
       </form>

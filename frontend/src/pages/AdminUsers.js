@@ -61,10 +61,22 @@ const AdminUsers = () => {
         sortOrder,
       };
       const response = await api.get('/users', { params });
-      setUsers(response.data);
+      
+      // Handle different response structures
+      let usersData = [];
+      if (response.data && response.data.users) {
+        usersData = response.data.users;
+      } else if (Array.isArray(response.data)) {
+        usersData = response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        usersData = response.data.data;
+      }
+      
+      setUsers(usersData || []);
     } catch (error) {
       setError('Failed to load users');
       console.error('Users error:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -74,26 +86,42 @@ const AdminUsers = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleFilterChange = (field, value) => {
+  const handleFilterChange = useCallback((field, value) => {
     setFilters(prev => ({
       ...prev,
       [field]: value
     }));
-  };
+  }, []);
 
-  const handleSort = (field) => {
+  const handleNameFilterChange = useCallback((e) => {
+    handleFilterChange('name', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleEmailFilterChange = useCallback((e) => {
+    handleFilterChange('email', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleAddressFilterChange = useCallback((e) => {
+    handleFilterChange('address', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleRoleFilterChange = useCallback((e) => {
+    handleFilterChange('role', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleSort = useCallback((field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
     } else {
       setSortBy(field);
       setSortOrder('ASC');
     }
-  };
+  }, [sortBy, sortOrder]);
 
-  const handleViewUser = (user) => {
+  const handleViewUser = useCallback((user) => {
     setSelectedUser(user);
     setViewDialogOpen(true);
-  };
+  }, []);
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -144,19 +172,19 @@ const AdminUsers = () => {
             <TextField
               label="Name"
               value={filters.name}
-              onChange={(e) => handleFilterChange('name', e.target.value)}
+              onChange={handleNameFilterChange}
               size="small"
             />
             <TextField
               label="Email"
               value={filters.email}
-              onChange={(e) => handleFilterChange('email', e.target.value)}
+              onChange={handleEmailFilterChange}
               size="small"
             />
             <TextField
               label="Address"
               value={filters.address}
-              onChange={(e) => handleFilterChange('address', e.target.value)}
+              onChange={handleAddressFilterChange}
               size="small"
             />
             <FormControl size="small" sx={{ minWidth: 120 }}>
@@ -164,7 +192,7 @@ const AdminUsers = () => {
               <Select
                 value={filters.role}
                 label="Role"
-                onChange={(e) => handleFilterChange('role', e.target.value)}
+                onChange={handleRoleFilterChange}
               >
                 <MenuItem value="">All</MenuItem>
                 <MenuItem value="admin">Admin</MenuItem>
@@ -205,7 +233,7 @@ const AdminUsers = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
+            {(users || []).map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>

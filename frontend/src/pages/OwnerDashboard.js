@@ -35,20 +35,51 @@ const OwnerDashboard = () => {
         params: { ownerId: user.id }
       });
       
-      if (storesResponse.data.length === 0) {
+      // Handle different response structures
+      let stores = [];
+      if (storesResponse.data && storesResponse.data.stores) {
+        stores = storesResponse.data.stores;
+      } else if (Array.isArray(storesResponse.data)) {
+        stores = storesResponse.data;
+      } else if (storesResponse.data && Array.isArray(storesResponse.data.data)) {
+        stores = storesResponse.data.data;
+      }
+      
+      if (!stores || stores.length === 0) {
         setError('No store found for this account');
         return;
       }
 
-      const store = storesResponse.data[0];
+      const store = stores[0];
+      
+      if (!store || !store.id) {
+        setError('Invalid store data received');
+        return;
+      }
       
       // Get ratings for this store
       const ratingsResponse = await api.get(`/ratings/store/${store.id}`);
+      
+      // Handle different ratings response structures
+      let ratings = [];
+      let averageRating = 0;
+      let totalRatings = 0;
+      
+      if (ratingsResponse.data && ratingsResponse.data.ratings) {
+        ratings = ratingsResponse.data.ratings;
+        averageRating = ratingsResponse.data.averageRating || 0;
+        totalRatings = ratingsResponse.data.totalRatings || 0;
+      } else if (Array.isArray(ratingsResponse.data)) {
+        ratings = ratingsResponse.data;
+      } else if (ratingsResponse.data && Array.isArray(ratingsResponse.data.data)) {
+        ratings = ratingsResponse.data.data;
+      }
+      
       setStoreData({
         store,
-        ratings: ratingsResponse.data.ratings || [],
-        averageRating: ratingsResponse.data.averageRating || 0,
-        totalRatings: ratingsResponse.data.totalRatings || 0
+        ratings: ratings || [],
+        averageRating: averageRating || 0,
+        totalRatings: totalRatings || 0
       });
     } catch (error) {
       setError('Failed to load store data');
@@ -153,7 +184,7 @@ const OwnerDashboard = () => {
             </Typography>
           </Box>
 
-          {storeData.ratings.length === 0 ? (
+          {(storeData.ratings || []).length === 0 ? (
             <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
               No ratings yet for your store.
             </Typography>
@@ -169,7 +200,7 @@ const OwnerDashboard = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {storeData.ratings.map((rating) => (
+                  {(storeData.ratings || []).map((rating) => (
                     <TableRow key={rating.id}>
                       <TableCell>{rating.user?.name || 'Unknown User'}</TableCell>
                       <TableCell>{rating.user?.email || 'N/A'}</TableCell>

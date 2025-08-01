@@ -56,10 +56,22 @@ const AdminStores = () => {
         sortOrder,
       };
       const response = await api.get('/stores', { params });
-      setStores(response.data);
+      
+      // Handle different response structures
+      let storesData = [];
+      if (response.data && response.data.stores) {
+        storesData = response.data.stores;
+      } else if (Array.isArray(response.data)) {
+        storesData = response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        storesData = response.data.data;
+      }
+      
+      setStores(storesData || []);
     } catch (error) {
       setError('Failed to load stores');
       console.error('Stores error:', error);
+      setStores([]);
     } finally {
       setLoading(false);
     }
@@ -69,26 +81,38 @@ const AdminStores = () => {
     fetchStores();
   }, [fetchStores]);
 
-  const handleFilterChange = (field, value) => {
+  const handleFilterChange = useCallback((field, value) => {
     setFilters(prev => ({
       ...prev,
       [field]: value
     }));
-  };
+  }, []);
 
-  const handleSort = (field) => {
+  const handleNameFilterChange = useCallback((e) => {
+    handleFilterChange('name', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleEmailFilterChange = useCallback((e) => {
+    handleFilterChange('email', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleAddressFilterChange = useCallback((e) => {
+    handleFilterChange('address', e.target.value);
+  }, [handleFilterChange]);
+
+  const handleSort = useCallback((field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
     } else {
       setSortBy(field);
       setSortOrder('ASC');
     }
-  };
+  }, [sortBy, sortOrder]);
 
-  const handleViewStore = (store) => {
+  const handleViewStore = useCallback((store) => {
     setSelectedStore(store);
     setViewDialogOpen(true);
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -131,19 +155,19 @@ const AdminStores = () => {
             <TextField
               label="Store Name"
               value={filters.name}
-              onChange={(e) => handleFilterChange('name', e.target.value)}
+              onChange={handleNameFilterChange}
               size="small"
             />
             <TextField
               label="Email"
               value={filters.email}
-              onChange={(e) => handleFilterChange('email', e.target.value)}
+              onChange={handleEmailFilterChange}
               size="small"
             />
             <TextField
               label="Address"
               value={filters.address}
-              onChange={(e) => handleFilterChange('address', e.target.value)}
+              onChange={handleAddressFilterChange}
               size="small"
             />
           </Box>
@@ -180,20 +204,14 @@ const AdminStores = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {stores.map((store) => (
+            {(stores || []).map((store) => (
               <TableRow key={store.id}>
                 <TableCell>{store.name}</TableCell>
                 <TableCell>{store.email}</TableCell>
                 <TableCell>{store.address}</TableCell>
-                <TableCell>{store.owner?.name || 'Unknown'}</TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Rating 
-                      value={store.averageRating || 0} 
-                      readOnly 
-                      size="small"
-                      precision={0.1}
-                    />
+                    <Rating value={store.averageRating || 0} readOnly size="small" />
                     <Typography variant="body2" sx={{ ml: 1 }}>
                       ({store.totalRatings || 0})
                     </Typography>

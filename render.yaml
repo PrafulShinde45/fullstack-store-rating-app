@@ -31,10 +31,8 @@ services:
           property: password
       - key: JWT_SECRET
         generateValue: true
-      - key: REACT_APP_API_URL
-        value: https://fullstack-store-rating-app-vvxn.onrender.co
 
 databases:
   - name: store-rating-db
-    databaseName: store_rating_app_dqgw
+    databaseName: store_rating_app
     user: store_rating_user 

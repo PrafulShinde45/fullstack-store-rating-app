@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -27,13 +27,13 @@ const AddUserDialog = ({ open, onClose, onUserAdded }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,7 +99,7 @@ const AddUserDialog = ({ open, onClose, onUserAdded }) => {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setFormData({
       name: '',
       email: '',
@@ -110,7 +110,7 @@ const AddUserDialog = ({ open, onClose, onUserAdded }) => {
     setError('');
     setSuccess('');
     onClose();
-  };
+  }, [onClose]);
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -141,7 +141,6 @@ const AddUserDialog = ({ open, onClose, onUserAdded }) => {
               required
               variant="outlined"
               placeholder="Enter full name (minimum 20 characters)"
-              helperText="Name must be at least 20 characters long"
             />
             
             <TextField
@@ -165,8 +164,7 @@ const AddUserDialog = ({ open, onClose, onUserAdded }) => {
               onChange={handleInputChange}
               required
               variant="outlined"
-              placeholder="Enter password (8-16 characters, uppercase + special char)"
-              helperText="Password must be 8-16 characters with uppercase letter and special character"
+              placeholder="Enter password (8+ chars, uppercase + special char)"
             />
             
             <TextField
